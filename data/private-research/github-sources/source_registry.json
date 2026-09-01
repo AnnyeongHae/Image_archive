@@ -1,0 +1,49 @@
+{
+  "schema_version": "image-archive-github-source-registry-1.0",
+  "policy": {
+    "allowlist_only": true,
+    "default_collection_mode": "metadata_only",
+    "download_binaries": false,
+    "repository_license_is_item_rights_clearance": false,
+    "public_release": false
+  },
+  "sources": [
+    {
+      "source_id": "github-freestylefly-awesome-gpt-image-2",
+      "repository": "freestylefly/awesome-gpt-image-2",
+      "enabled": true,
+      "prompt_path_globs": [
+        "README*.md",
+        "docs/*.md",
+        "docs/**/*.md",
+        "data/*.json",
+        "data/**/*.json"
+      ],
+      "media_path_globs": [
+        "*.png",
+        "*.jpg",
+        "*.jpeg",
+        "*.webp",
+        "*.gif",
+        "*.avif",
+        "**/*.png",
+        "**/*.jpg",
+        "**/*.jpeg",
+        "**/*.webp",
+        "**/*.gif",
+        "**/*.avif",
+        "assets/*.png",
+        "assets/*.jpg",
+        "assets/*.jpeg",
+        "assets/*.webp",
+        "assets/**/*.png",
+        "assets/**/*.jpg",
+        "assets/**/*.jpeg",
+        "assets/**/*.webp"
+      ],
+      "observed_repository_license": "MIT",
+      "content_rights_default": "private_reference_only",
+      "notes": "Repository metadata and in-repo file candidates only. Linked social media and user-attachments are outside repository-license scope."
+    }
+  ]
+}

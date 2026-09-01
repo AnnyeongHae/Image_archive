@@ -1,0 +1,36 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+.tmp/
+dist/
+Reports/
+
+# GitHub is the source/contract boundary, not the multi-GB data lake.
+data/private-research/*
+!data/private-research/github-sources/
+data/private-research/github-sources/*
+!data/private-research/github-sources/source_registry.json
+!data/private-research/github-sources/fixtures/
+data/public-export/
+data/canonical/
+
+# Local featured projections can contain admin-only reference content.
+app/data/
+
+legacy/
+experiments/
+media/
+
+*.sqlite
+*.sqlite3
+*.db
+*.jsonl
+
+qa/*.json
+qa/*.png
+qa/*.log
+qa/*.stdout.log
+qa/*.stderr.log

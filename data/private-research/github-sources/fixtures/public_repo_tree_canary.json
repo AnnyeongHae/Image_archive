@@ -1,0 +1,51 @@
+{
+  "schema_version": "github-public-repo-fixture-1.0",
+  "repository": {
+    "full_name": "example/reference-gallery",
+    "html_url": "https://github.com/example/reference-gallery",
+    "default_branch": "main",
+    "stargazers_count": 42,
+    "pushed_at": "2026-09-01T00:00:00Z",
+    "license": {
+      "spdx_id": "MIT"
+    }
+  },
+  "commit_sha": "1111111111111111111111111111111111111111",
+  "tree": [
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "size": 1200
+    },
+    {
+      "path": "docs/gallery.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "size": 2400
+    },
+    {
+      "path": "assets/example-a.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "size": 4096
+    },
+    {
+      "path": "assets/example-a-copy.png",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cccccccccccccccccccccccccccccccccccccccc",
+      "size": 4096
+    },
+    {
+      "path": "scripts/build.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dddddddddddddddddddddddddddddddddddddddd",
+      "size": 800
+    }
+  ]
+}
