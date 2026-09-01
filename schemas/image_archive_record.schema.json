@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.marketer/schemas/image_archive_record.schema.json",
+  "title": "Canonical Image Prompt Archive Record",
+  "description": "Versioned canonical row for the internal image-prompt reference archive. Public projections must apply separate rights and release gates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalog_key",
+    "lane",
+    "record_id",
+    "style_id",
+    "parent_style_id",
+    "title",
+    "prompt",
+    "source",
+    "license",
+    "rights",
+    "media",
+    "taxonomy",
+    "generation",
+    "review_release",
+    "provenance",
+    "search_text",
+    "content_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "canonical-image-prompt-record-1.1" },
+    "catalog_key": {
+      "type": "string",
+      "pattern": "^(legacy|external|social|manual|secret_codes|bul001|opennana):.+$"
+    },
+    "lane": {
+      "enum": ["legacy", "external", "social", "manual", "secret_codes", "bul001", "opennana"]
+    },
+    "record_id": { "type": "string", "minLength": 1 },
+    "style_id": { "type": "string", "minLength": 1 },
+    "parent_style_id": { "type": ["string", "null"] },
+    "title": { "type": "string", "minLength": 1 },
+    "prompt": { "$ref": "#/$defs/prompt" },
+    "source": { "$ref": "#/$defs/source" },
+    "license": { "$ref": "#/$defs/license" },
+    "rights": { "$ref": "#/$defs/rights" },
+    "media": { "$ref": "#/$defs/media" },
+    "taxonomy": { "$ref": "#/$defs/taxonomy" },
+    "generation": { "type": "object" },
+    "review_release": {
+      "type": "object",
+      "required": ["release_eligible"],
+      "properties": {
+        "release_eligible": { "type": "boolean" },
+        "review_status": { "type": ["string", "null"] },
+        "risk_flags": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source_file", "source_record_locator", "raw_source"],
+      "properties": {
+        "source_file": { "type": "string", "minLength": 1 },
+        "source_record_locator": { "type": "string", "minLength": 1 },
+        "raw_source": { "type": "object" }
+      }
+    },
+    "search_text": { "type": "string" },
+    "content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "nullableString": { "type": ["string", "null"] },
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present", "text", "sha256", "format", "language"],
+      "properties": {
+        "present": { "type": "boolean" },
+        "text": { "type": ["string", "null"] },
+        "sha256": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          ]
+        },
+        "format": { "$ref": "#/$defs/nullableString" },
+        "language": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url", "type", "repository", "commit", "pinned_url"],
+      "properties": {
+        "name": { "$ref": "#/$defs/nullableString" },
+        "url": { "$ref": "#/$defs/nullableString" },
+        "type": { "$ref": "#/$defs/nullableString" },
+        "repository": { "$ref": "#/$defs/nullableString" },
+        "commit": { "$ref": "#/$defs/nullableString" },
+        "pinned_url": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reported_spdx",
+        "detected_spdx",
+        "effective_spdx",
+        "status",
+        "scope",
+        "evidence_url",
+        "note"
+      ],
+      "properties": {
+        "reported_spdx": { "$ref": "#/$defs/nullableString" },
+        "detected_spdx": { "$ref": "#/$defs/nullableString" },
+        "effective_spdx": { "$ref": "#/$defs/nullableString" },
+        "status": { "type": "string", "minLength": 1 },
+        "scope": { "$ref": "#/$defs/nullableString" },
+        "evidence_url": { "$ref": "#/$defs/nullableString" },
+        "note": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "rights_tier",
+        "portfolio_visibility",
+        "admin_usage_status",
+        "public_metadata_eligible",
+        "release_eligible",
+        "explicitly_cleared",
+        "prompt_publication_eligible",
+        "media_publication_eligible",
+        "commercial_reuse_claimed",
+        "requires_human_review",
+        "license_is_not_item_rights_clearance",
+        "risk_flags",
+        "effective_spdx"
+      ],
+      "properties": {
+        "status": { "type": "string", "minLength": 1 },
+        "rights_tier": { "enum": ["P1", "P2", "P3", "P4"] },
+        "portfolio_visibility": { "enum": ["public", "metadata_link_only", "admin_only"] },
+        "admin_usage_status": { "enum": ["public_or_metadata", "reference_allowed", "quarantine_only"] },
+        "public_metadata_eligible": { "type": "boolean" },
+        "release_eligible": { "type": "boolean" },
+        "explicitly_cleared": { "type": "boolean" },
+        "prompt_publication_eligible": { "type": "boolean" },
+        "media_publication_eligible": { "type": "boolean" },
+        "commercial_reuse_claimed": { "type": "boolean" },
+        "requires_human_review": { "type": "boolean" },
+        "license_is_not_item_rights_clearance": { "type": "boolean" },
+        "risk_flags": { "$ref": "#/$defs/stringArray" },
+        "effective_spdx": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "mediaAsset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uri",
+        "uri_kind",
+        "origin",
+        "role",
+        "sha256",
+        "mime_type",
+        "width",
+        "height",
+        "private_path",
+        "generated_staging",
+        "release_eligible"
+      ],
+      "properties": {
+        "uri": { "type": "string", "minLength": 1 },
+        "uri_kind": { "enum": ["local", "remote", "missing"] },
+        "origin": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 },
+        "sha256": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          ]
+        },
+        "mime_type": { "$ref": "#/$defs/nullableString" },
+        "width": { "type": ["integer", "null"], "minimum": 1 },
+        "height": { "type": ["integer", "null"], "minimum": 1 },
+        "private_path": { "type": "boolean" },
+        "generated_staging": { "type": "boolean" },
+        "release_eligible": { "type": "boolean" }
+      }
+    },
+    "media": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assets", "primary_role"],
+      "properties": {
+        "assets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/mediaAsset" }
+        },
+        "primary_role": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "taxonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product_categories",
+        "section_roles",
+        "visual_techniques",
+        "style_tags",
+        "use_case_tags",
+        "languages",
+        "search_facets"
+      ],
+      "properties": {
+        "product_categories": { "$ref": "#/$defs/stringArray" },
+        "section_roles": { "$ref": "#/$defs/stringArray" },
+        "visual_techniques": { "$ref": "#/$defs/stringArray" },
+        "style_tags": { "$ref": "#/$defs/stringArray" },
+        "use_case_tags": { "$ref": "#/$defs/stringArray" },
+        "languages": { "$ref": "#/$defs/stringArray" },
+        "search_facets": { "type": "object" }
+      }
+    }
+  }
+}

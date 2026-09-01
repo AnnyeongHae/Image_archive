@@ -1,0 +1,50 @@
+name: GitHub source daily observation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "20 0 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-source-daily-observation
+  cancel-in-progress: false
+
+jobs:
+  observe-public-metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout reviewed source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.13"
+          cache: ""
+
+      - name: Validate collector and repository boundary
+        run: |
+          python -m unittest qa.test_github_source_collector qa.test_github_daily_observation -v
+          python qa/validate_repository_boundary.py
+          python qa/validate_daily_source_workflow.py
+
+      - name: Observe allowlisted public repositories
+        run: >-
+          python src/github_sources/run_registry_observation.py
+          --fetch
+          --limit-per-source 5000
+          --report qa/github-source-daily-observation.json
+          --quiet
+
+      - name: Upload metadata-only observation
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: github-source-daily-observation
+          path: qa/github-source-daily-observation.json
+          if-no-files-found: error
+          retention-days: 14

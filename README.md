@@ -96,9 +96,14 @@ python qa/validate_opennana_review_queue.py
 python qa/verify_neon_env.py
 python -m unittest qa.test_github_source_collector -v
 python -m unittest qa.test_opennana_review_api -v
+python -m unittest qa.test_archive_platform_contract -v
 python qa/validate_github_workflow.py
+python qa/validate_daily_source_workflow.py
 # 공개 API read-only canary; --apply 없이는 artifact도 쓰지 않음
 python src/github_sources/collect_public_repo.py --repo freestylefly/awesome-gpt-image-2 --fetch --limit 100
+# Neon schema는 dry-run -> rollback check -> 명시적 apply 순서
+python -m src.archive_platform.migrate
+python -m src.archive_platform.migrate --check
 ```
 
 전수 로컬 캐시는 scope가 무제한인 것이지, 보호 장치를 제거한 무제한 병렬 다운로드가 아니다. 기본 전체 동시성은 4(최대 8)지만 동일 host는 동시성 1과 최소 간격 1초를 유지한다. 파일당 최대 15 MiB, decode 최대 80 MP, checkpoint 간격 25 URL, D: 최소 여유 공간 5 GiB를 유지한다. 429/5xx는 최대 5회 재시도하고 backoff는 60초에서 cap한다. 디스크 하한이나 중단을 만나면 현재 cache index를 보존하고, 공간을 확보한 뒤 같은 명령으로 이어서 받는다.
@@ -110,7 +115,7 @@ python src/github_sources/collect_public_repo.py --repo freestylefly/awesome-gpt
 승인·그룹 결과는 내부 canonical archive에 반영되지만, `release_eligible=false`를 유지한다. 공개 export에는 프롬프트 원문과 원본 이미지 URL을 승계하지 않으며, 권리·상업 이용·외부 공개 게이트는 자동으로 열리지 않는다.
 
 `app/data/featured-five.js`와 `dist/`는 canonical JSON에서 만든 파생물이다.
-`data/public-export/`는 500개 단위 38개 shard로 구성된 권리 필터링 projection이다. 현재 항목 단위 권리·릴리스 승인을 통과한 레코드가 없으므로 공개 shard에는 프롬프트 원문과 미디어를 넣지 않고 메타데이터만 둔다.
+`data/public-export/`는 권리 필터링 projection이다. 현재 18,815건이 모두 P3이므로 공개 레코드와 공개 shard는 0개다. P1/P2 승인이 생길 때만 공개 DTO가 생성된다.
 대용량 내부 JSONL·legacy JSON·SQLite·원본 수집 이미지는 `dist/`에 포함하지 않는다.
 
 ## 로컬 서버
@@ -127,6 +132,7 @@ python src/opennana/review_server.py --host 127.0.0.1 --port 8765
 - 체크박스 승인 큐: `http://127.0.0.1:8765/legacy/current_archive/approval-requests.html`
 - 중복 그룹 검토: `http://127.0.0.1:8765/legacy/current_archive/duplicate-review.html`
 - GitHub Actions 부트스트랩: `docs/GITHUB_ACTIONS_ENABLEMENT.md`
+- Neon/API canary: `docs/NEON_SCHEMA.md`
 
 HTTP 회귀 검증:
 
