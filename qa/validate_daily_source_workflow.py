@@ -23,6 +23,7 @@ def main() -> int:
     errors: list[str] = []
     require("schedule:" in text, "daily schedule missing", errors)
     require("workflow_dispatch:" in text, "manual trigger missing", errors)
+    require("push:" in text, "path-scoped push trigger missing", errors)
     require("contents: read" in text, "permissions must remain contents: read", errors)
     require("run_registry_observation.py" in text, "registry observer missing", errors)
     require("--fetch" in text and "--report" in text, "explicit fetch/report gates missing", errors)

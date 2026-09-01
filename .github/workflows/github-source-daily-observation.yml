@@ -4,6 +4,15 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "20 0 * * *"
+  push:
+    paths:
+      - ".github/workflows/github-source-daily-observation.yml"
+      - "src/github_sources/**"
+      - "qa/test_github_source_collector.py"
+      - "qa/test_github_daily_observation.py"
+      - "qa/validate_daily_source_workflow.py"
+      - "qa/validate_repository_boundary.py"
+      - "data/private-research/github-sources/source_registry.json"
 
 permissions:
   contents: read
