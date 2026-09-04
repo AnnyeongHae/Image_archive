@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <title>Image Prompt Archive · Admin Staging</title>
+    <link rel="stylesheet" href="/app.css">
+    <script src="/admin/admin.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">ADMIN STAGING · READ ONLY</p>
+      <h1>Access boundary verified.</h1>
+      <p class="lead">관리자 화면 골격만 배포했습니다. 데이터와 변경 기능은 아직 연결하지 않았습니다.</p>
+      <section aria-label="관리자 staging 상태">
+        <dl id="status-list">
+          <div><dt>Access JWT</dt><dd>확인 중</dd></div>
+          <div><dt>Private records</dt><dd>0</dd></div>
+          <div><dt>Mutation</dt><dd>Disabled</dd></div>
+          <div><dt>Next gate</dt><dd>Neon 50 read-only</dd></div>
+        </dl>
+      </section>
+      <p id="status" class="status" role="status" aria-live="polite">Worker 상태를 불러오는 중입니다.</p>
+      <p><a class="button" href="/">staging 첫 화면</a></p>
+    </main>
+  </body>
+</html>

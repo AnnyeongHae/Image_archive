@@ -19,6 +19,7 @@ try:
         DATA_ROOT,
         DEFAULT_REGISTRY,
         MAX_CANDIDATES,
+        PacedAPI,
         build_result,
         live_fixture,
         normalize_repository,
@@ -32,6 +33,7 @@ except ImportError:
         DATA_ROOT,
         DEFAULT_REGISTRY,
         MAX_CANDIDATES,
+        PacedAPI,
         build_result,
         live_fixture,
         normalize_repository,
@@ -54,10 +56,11 @@ def enabled_sources(registry: dict[str, Any]) -> list[dict[str, Any]]:
 
 def observe_registry(registry: dict[str, Any], *, limit_per_source: int) -> dict[str, Any]:
     reports: list[dict[str, Any]] = []
+    api = PacedAPI()
     blob_occurrences: Counter[tuple[str, str]] = Counter()
     for source in enabled_sources(registry):
         repository = normalize_repository(str(source["repository"]))
-        fixture, headers = live_fixture(repository)
+        fixture, headers = live_fixture(repository, get=api)
         report = build_result(source, fixture, mode="daily_live_metadata_observation", headers=headers, limit=limit_per_source)
         reports.append(report)
         for candidate in report.get("candidates") or []:

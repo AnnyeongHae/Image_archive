@@ -17,11 +17,13 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+from urllib.parse import quote
 
 
 PLATFORM_ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +37,26 @@ API_VERSION = "2022-11-28"
 
 class CollectorError(RuntimeError):
     """Raised for a fail-closed collector condition."""
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise CollectorError("GitHub API redirects require allowlist review")
+
+
+class PacedAPI:
+    """One sequential request start per second, including metadata requests."""
+    def __init__(self, *, get=None, clock=time.monotonic, sleep=time.sleep):
+        self.get = get or api_get
+        self.clock, self.sleep, self.last = clock, sleep, None
+
+    def __call__(self, *args, **kwargs):
+        if self.last is not None:
+            delay = 1.0 - (self.clock() - self.last)
+            if delay > 0:
+                self.sleep(delay)
+        self.last = self.clock()
+        return self.get(*args, **kwargs)
 
 
 def utc_now() -> str:
@@ -142,8 +164,10 @@ def api_get(path: str, token: str | None = None, *, allow_not_found: bool = Fals
         headers["Authorization"] = f"Bearer {token}"
     request = urllib.request.Request(url, headers=headers, method="GET")
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
-            body = response.read()
+        with urllib.request.build_opener(_NoRedirect()).open(request, timeout=30) as response:
+            body = response.read(16 * 1024 * 1024 + 1)
+            if len(body) > 16 * 1024 * 1024:
+                raise CollectorError("GitHub API response exceeds bounded read limit")
             response_headers = {key.lower(): value for key, value in response.headers.items()}
     except urllib.error.HTTPError as exc:
         if allow_not_found and exc.code == 404:
@@ -160,21 +184,34 @@ def api_get(path: str, token: str | None = None, *, allow_not_found: bool = Fals
     return payload, response_headers
 
 
-def live_fixture(repository: str) -> tuple[dict[str, Any], dict[str, str]]:
+def live_fixture(repository: str, *, get=None) -> tuple[dict[str, Any], dict[str, str]]:
+    # Resolve a commit before reading its tree. A Git tree SHA is not a commit
+    # SHA and must never be used in a /blob/ or raw-content URL.
+    get = get or PacedAPI()
+    repository = normalize_repository(repository)
     token = os.environ.get("SOURCE_GITHUB_TOKEN") or os.environ.get("GITHUB_TOKEN")
-    repo_payload, repo_headers = api_get(f"/repos/{repository}", token)
+    repo_payload, repo_headers = get(f"/repos/{repository}", token)
     if repo_payload.get("private") is not False:
         raise CollectorError("only public repositories are allowed")
+    if str(repo_payload.get("full_name", "")).casefold() != repository.casefold():
+        raise CollectorError("repository identity changed; review the allowlist")
     default_branch = str(repo_payload.get("default_branch") or "")
     if not default_branch:
         raise CollectorError("repository has no default branch")
-    tree_payload, tree_headers = api_get(f"/repos/{repository}/git/trees/{default_branch}?recursive=1", token)
+    commit_payload, _ = get(f"/repos/{repository}/commits/{quote(default_branch, safe='')}", token)
+    commit_sha = str(commit_payload.get("sha") or "")
+    tree_sha = str(((commit_payload.get("commit") or {}).get("tree") or {}).get("sha") or "")
+    if not all(re.fullmatch(r"[0-9a-f]{40}", value) for value in (commit_sha, tree_sha)):
+        raise CollectorError("repository commit or tree identity is missing")
+    tree_payload, tree_headers = get(f"/repos/{repository}/git/trees/{tree_sha}?recursive=1", token)
+    if tree_payload.get("sha") != tree_sha:
+        raise CollectorError("pinned tree identity mismatch")
     if tree_payload.get("truncated") is True:
         raise CollectorError("recursive tree response was truncated")
     tree = tree_payload.get("tree")
     if not isinstance(tree, list):
         raise CollectorError("repository tree is missing")
-    license_payload, license_headers = api_get(f"/repos/{repository}/license", token, allow_not_found=True)
+    license_payload, license_headers = get(f"/repos/{repository}/license?ref={commit_sha}", token, allow_not_found=True)
     license_info = license_payload.get("license") if isinstance(license_payload.get("license"), dict) else repo_payload.get("license")
     fixture = {
         "schema_version": "github-public-repo-live-snapshot-1.0",
@@ -186,7 +223,8 @@ def live_fixture(repository: str) -> tuple[dict[str, Any], dict[str, str]]:
             "pushed_at": repo_payload.get("pushed_at"),
             "license": license_info,
         },
-        "commit_sha": tree_payload.get("sha"),
+        "commit_sha": commit_sha,
+        "tree_sha": tree_sha,
         "tree": tree,
     }
     headers = {
@@ -218,8 +256,9 @@ def build_result(source: dict[str, Any], fixture: dict[str, Any], *, mode: str, 
             {
                 "repository": repository,
                 "repository_commit_sha": commit_sha,
-                "source_url": f"https://github.com/{repository}/blob/{commit_sha}/{row['path']}",
-                "raw_candidate_url": f"https://raw.githubusercontent.com/{repository}/{commit_sha}/{row['path']}",
+                "repository_tree_sha": fixture.get("tree_sha"),
+                "source_url": f"https://github.com/{repository}/blob/{commit_sha}/{quote(row['path'], safe='/')}",
+                "raw_candidate_url": f"https://raw.githubusercontent.com/{repository}/{commit_sha}/{quote(row['path'], safe='/')}",
                 "repository_license_spdx": spdx,
                 "license_scope": "repository_observed_not_item_clearance",
                 "rights_status": "private_reference_only",
@@ -237,6 +276,7 @@ def build_result(source: dict[str, Any], fixture: dict[str, Any], *, mode: str, 
         "repository": repository,
         "repository_url": repo_meta.get("html_url") or f"https://github.com/{repository}",
         "repository_commit_sha": commit_sha,
+        "repository_tree_sha": fixture.get("tree_sha"),
         "default_branch": repo_meta.get("default_branch"),
         "stars_observed": repo_meta.get("stargazers_count"),
         "pushed_at_observed": repo_meta.get("pushed_at"),

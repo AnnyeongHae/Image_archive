@@ -10,9 +10,12 @@ on:
       - "src/github_sources/**"
       - "qa/test_github_source_collector.py"
       - "qa/test_github_daily_observation.py"
+      - "qa/test_github_source_intake.py"
+      - "qa/test_github_source_seal.mjs"
       - "qa/validate_daily_source_workflow.py"
       - "qa/validate_repository_boundary.py"
       - "data/private-research/github-sources/source_registry.json"
+      - "config/intake-recipient.public.jwk.json"
 
 permissions:
   contents: read
@@ -22,9 +25,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  observe-public-metadata:
+  observe-and-seal-private-intake:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout reviewed source
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -37,7 +40,8 @@ jobs:
 
       - name: Validate collector and repository boundary
         run: |
-          python -m unittest qa.test_github_source_collector qa.test_github_daily_observation -v
+          python -m unittest qa.test_github_source_collector qa.test_github_daily_observation qa.test_github_source_intake -v
+          node --test qa/test_github_source_seal.mjs
           python qa/validate_repository_boundary.py
           python qa/validate_daily_source_workflow.py
 
@@ -49,11 +53,60 @@ jobs:
           --report qa/github-source-daily-observation.json
           --quiet
 
+      # Public-key validation must precede all prompt-body requests. The owner
+      # private key is never sent to Actions. Missing keys block this lane.
+      - name: Validate owner encryption recipient
+        run: node src/github_sources/seal_intake.mjs verify --public-key config/intake-recipient.public.jwk.json
+
+      - name: Restore hash-only delivery checkpoint
+        id: checkpoint
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          path: ${{ runner.temp }}/archive-intake-checkpoint/checkpoint.json
+          key: archive-intake-hashes-v1-${{ hashFiles('config/intake-recipient.public.jwk.json') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            archive-intake-hashes-v1-${{ hashFiles('config/intake-recipient.public.jwk.json') }}-
+
+      - name: Collect at most 20 containers into sealed private intake
+        run: >-
+          python src/github_sources/collect_sealed_intake.py
+          --fetch --collect --max-containers 20
+          --public-key config/intake-recipient.public.jwk.json
+          --checkpoint "${{ runner.temp }}/archive-intake-checkpoint/checkpoint.json"
+          --pending-checkpoint "${{ runner.temp }}/archive-intake-output/checkpoint.pending.json"
+          --sealed-output "${{ runner.temp }}/archive-intake-output/intake.sealed.json"
+          --report qa/github-source-sealed-summary.json
+
+      - name: Upload sealed private intake only
+        id: sealed_upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: github-source-sealed-intake
+          path: ${{ runner.temp }}/archive-intake-output/intake.sealed.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Acknowledge successful ciphertext upload
+        run: >-
+          python src/github_sources/collect_sealed_intake.py
+          --acknowledge-artifact-id "${{ steps.sealed_upload.outputs.artifact-id }}"
+          --checkpoint "${{ runner.temp }}/archive-intake-checkpoint/checkpoint.json"
+          --pending-checkpoint "${{ runner.temp }}/archive-intake-output/checkpoint.pending.json"
+          --sealed-output "${{ runner.temp }}/archive-intake-output/intake.sealed.json"
+
+      - name: Save acknowledged hash-only checkpoint
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          path: ${{ runner.temp }}/archive-intake-checkpoint/checkpoint.json
+          key: ${{ steps.checkpoint.outputs.cache-primary-key }}
+
       - name: Upload metadata-only observation
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: github-source-daily-observation
-          path: qa/github-source-daily-observation.json
+          path: |
+            qa/github-source-daily-observation.json
+            qa/github-source-sealed-summary.json
           if-no-files-found: error
           retention-days: 14

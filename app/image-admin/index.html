@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="light">
+  <title>이미지 검토 관리자</title>
+  <link rel="stylesheet" href="/admin.css">
+  <script src="/admin.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#stage-content">본문으로 건너뛰기</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="이미지 검토 단계">
+      <a class="brand" href="/" aria-label="이미지 검토 관리자"><span class="brand-symbol" aria-hidden="true">◫</span><span>IMAGE ARCHIVE<small>이미지 검토 관리자</small></span></a>
+      <div class="batch-card"><span class="eyebrow">현재 검토 묶음</span><strong id="batch-title">불러오는 중</strong><span id="batch-detail" class="muted">저장된 검토 내용을 확인합니다.</span></div>
+      <nav id="stage-nav" class="stage-nav" aria-label="검토 순서"></nav>
+      <div class="sidebar-bottom"><span class="local-badge"><i aria-hidden="true"></i> 내 컴퓨터 · 비공개</span><p>중간 저장은 자동으로 이루어집니다.<br>단계 승인은 아래 버튼으로 진행하세요.</p><button id="gallery-open" class="button subtle" type="button">승인된 이미지 보기 <span aria-hidden="true">↗</span></button></div>
+    </aside>
+    <main class="main-panel">
+      <header class="topbar"><div><span class="breadcrumb">라이브러리 <span aria-hidden="true">/</span> 검토 공간</span><span id="header-stage" class="header-stage"></span></div><label class="reviewer-field">검토자<input id="reviewer" type="text" autocomplete="name" maxlength="200" placeholder="이름"></label></header>
+      <div class="workspace">
+        <div id="connection-banner" class="alert" hidden role="alert"><div><strong id="error-title"></strong><p id="error-text"></p></div><div class="alert-actions"><button id="retry-write" class="button small" type="button" hidden>다시 시도</button><button id="reload-state" class="button small" type="button" hidden>서버의 최신 내용 불러오기</button></div></div>
+        <div id="recovery-banner" class="note" hidden><strong>이 창의 이전 편집을 임시 보관하고 있습니다.</strong><p id="recovery-detail"></p><button id="restore-draft" class="button small" type="button">보관된 내 편집 복원</button></div>
+        <div id="live-message" class="sr-only" role="status" aria-live="polite"></div>
+        <section id="stage-content" class="stage-content" aria-busy="true" tabindex="-1"><div class="loading"><span class="spinner" aria-hidden="true"></span><h1>검토 공간을 준비하고 있습니다.</h1><p>마지막으로 저장한 위치에서 이어갑니다.</p></div></section>
+      </div>
+      <footer class="action-bar"><div class="save-status" role="status" aria-live="polite"><span id="save-dot" class="status-dot"></span><div><strong id="save-label">연결 중</strong><small id="save-detail">서버에서 검토 내용을 불러옵니다.</small></div></div><div class="footer-actions"><button id="previous-stage" class="button secondary" type="button" disabled>이전 단계</button><button id="save-draft" class="button secondary" type="button" disabled>중간 저장</button><button id="footer-gallery" class="button secondary" type="button" disabled>승인된 이미지 보기</button><button id="advance-stage" class="button primary" type="button" disabled>불러오는 중</button></div></footer>
+    </main>
+  </div>
+  <dialog id="zoom-dialog" class="zoom-dialog" aria-labelledby="zoom-title"><div class="dialog-top"><h2 id="zoom-title">이미지 크게 보기</h2><button class="icon-button" data-close-dialog="zoom-dialog" aria-label="이미지 확대 닫기" type="button">×</button></div><img id="zoom-image" alt=""><p id="zoom-caption"></p><div id="zoom-prompt-actions"></div><div id="zoom-rights"></div></dialog>
+  <dialog id="gallery-dialog" class="gallery-dialog" aria-labelledby="gallery-title"><div class="dialog-top"><div><span class="eyebrow">마지막 승인 결과</span><h2 id="gallery-title">승인된 이미지</h2></div><button class="icon-button" data-close-dialog="gallery-dialog" aria-label="승인 이미지 창 닫기" type="button">×</button></div><p class="muted">현재 검토 중인 변경은 최종 승인 전까지 이 목록에 반영되지 않습니다.</p><div id="gallery-content"></div></dialog>
+  <dialog id="prompt-dialog" class="prompt-dialog" aria-labelledby="prompt-title"><div class="dialog-top"><div><span class="eyebrow">원본 프롬프트</span><h2 id="prompt-title">프롬프트 확인</h2></div><button class="icon-button" data-close-dialog="prompt-dialog" aria-label="프롬프트 창 닫기" type="button">×</button></div><p id="prompt-source" class="muted"></p><label class="sr-only" for="prompt-text">원본 프롬프트 전체</label><textarea id="prompt-text" class="prompt-text" readonly spellcheck="false" wrap="off" aria-describedby="prompt-status"></textarea><div class="prompt-toolbar"><button id="prompt-copy" class="button primary" type="button" disabled>원문 전체 복사</button><button id="prompt-select" class="button secondary" type="button" disabled>전체 선택</button><button id="prompt-retry" class="button secondary" type="button" hidden>다시 불러오기</button></div><p id="prompt-status" class="prompt-status" role="status" aria-live="polite"></p><div id="prompt-rights"></div></dialog>
+</body>
+</html>

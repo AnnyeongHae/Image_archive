@@ -4,6 +4,7 @@ import importlib.util
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 PLATFORM_ROOT = Path(__file__).resolve().parents[1]
@@ -51,6 +52,40 @@ class GitHubSourceCollectorTests(unittest.TestCase):
             saved = collector.read_json(report)
             self.assertEqual(saved["mode"], "offline_fixture")
             self.assertNotIn("private_run_artifact", saved)
+
+    def test_live_snapshot_resolves_real_commit_then_pinned_tree(self) -> None:
+        commit, tree = "1" * 40, "2" * 40
+        responses = [
+            ({"private": False, "full_name": "example/repo", "default_branch": "feature/gallery"}, {}),
+            ({"sha": commit, "commit": {"tree": {"sha": tree}}}, {}),
+            ({"sha": tree, "tree": []}, {}),
+            ({}, {}),
+        ]
+        with patch.object(collector, "api_get", side_effect=responses) as get:
+            fixture, _ = collector.live_fixture("example/repo", get=get)
+        self.assertEqual(fixture["commit_sha"], commit)
+        self.assertEqual(fixture["tree_sha"], tree)
+        paths = [call.args[0] for call in get.call_args_list]
+        self.assertEqual(paths[1], "/repos/example/repo/commits/feature%2Fgallery")
+        self.assertEqual(paths[2], f"/repos/example/repo/git/trees/{tree}?recursive=1")
+        self.assertEqual(paths[3], f"/repos/example/repo/license?ref={commit}")
+
+    def test_pinned_tree_mismatch_and_private_repository_fail_closed(self) -> None:
+        with patch.object(collector, "api_get", return_value=({"private": True}, {})) as get:
+            with self.assertRaises(collector.CollectorError):
+                collector.live_fixture("example/repo", get=get)
+            self.assertEqual(get.call_count, 1)
+        with patch.object(collector, "api_get", side_effect=[
+            ({"private": False, "full_name": "example/repo", "default_branch": "main"}, {}),
+            ({"sha": "1" * 40, "commit": {"tree": {"sha": "2" * 40}}}, {}),
+            ({"sha": "3" * 40, "tree": []}, {}),
+        ]) as get:
+            with self.assertRaises(collector.CollectorError):
+                collector.live_fixture("example/repo", get=get)
+
+    def test_redirect_is_not_followed(self) -> None:
+        with self.assertRaises(collector.CollectorError):
+            collector._NoRedirect().redirect_request(None, None, 302, "moved", {}, "https://other.example/")
 
 
 if __name__ == "__main__":

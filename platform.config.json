@@ -1,0 +1,261 @@
+{
+  "schema_version": "1.0.0",
+  "platform_id": "image-prompt-reference-archive",
+  "status": "internal_canary",
+  "mode": "reference_only",
+  "paths": {
+    "canonical_featured": "data/canonical/featured_five.json",
+    "canonical_records": "data/canonical/archive_records.jsonl",
+    "canonical_manifest": "data/canonical/archive_records_manifest.json",
+    "public_catalog_index": "data/public-export/catalog-index.json",
+    "app": "app",
+    "public_media": "media/public",
+    "legacy_archive": "legacy/current_archive",
+    "source_admin": "legacy/current_archive/source-admin.html",
+    "approval_requests": "legacy/current_archive/approval-requests.html",
+    "duplicate_review": "legacy/current_archive/duplicate-review.html",
+    "duplicate_index_builder": "src/build_duplicate_index.py",
+    "duplicate_index": "data/private-research/duplicate-analysis/current/duplicate_index.sqlite3",
+    "duplicate_summary": "data/private-research/duplicate-analysis/current/summary.json",
+    "experiments": "experiments",
+    "experiment_migration_manifest": "data/canonical/experiment_migration_manifest.json",
+    "build_entry": "src/build_static_canary.py",
+    "canonical_build_entry": "src/build_canonical_archive.py",
+    "canonical_validation_entry": "qa/validate_canonical_archive.py",
+    "validation_entry": "qa/validate_platform.py",
+    "opennana_config": "data/private-research/opennana/config.json",
+    "opennana_state": "data/private-research/opennana/state.json",
+    "opennana_review_queue": "data/private-research/opennana/review_queue/current.json",
+    "opennana_pipeline_entry": "src/opennana/run_pipeline.py",
+    "opennana_decision_entry": "src/opennana/apply_decisions.py",
+    "opennana_review_server": "src/opennana/review_server.py",
+    "opennana_archive_builder": "src/opennana/build_archive_lane.py",
+    "opennana_internal_archive": "data/private-research/opennana/archive/opennana_records.json",
+    "opennana_validation_entry": "qa/validate_opennana_workflow.py",
+    "build_output": "dist"
+  },
+  "workflow": {
+    "reference_candidates_per_request": 5,
+    "human_choice_required": true,
+    "generation_before_choice": false
+  },
+  "rights_access_policy": {
+    "status": "active_fail_closed",
+    "public_tiers": ["P1", "P2"],
+    "admin_only_tiers": ["P3", "P4"],
+    "tiers": {
+      "P1": {
+        "portfolio_visibility": "public",
+        "admin_usage_status": "public_or_metadata"
+      },
+      "P2": {
+        "portfolio_visibility": "metadata_link_only",
+        "admin_usage_status": "public_or_metadata"
+      },
+      "P3": {
+        "portfolio_visibility": "admin_only",
+        "admin_usage_status": "reference_allowed"
+      },
+      "P4": {
+        "portfolio_visibility": "admin_only",
+        "admin_usage_status": "quarantine_only"
+      }
+    },
+    "unknown_is_permission": false,
+    "repository_license_is_item_rights_clearance": false
+  },
+  "source_automation": {
+    "opennana": {
+      "status": "active_review_only",
+      "automation_id": "opennana",
+      "cadence": "daily_at_09_00_Asia_Seoul",
+      "canary_max_free_details_per_run": 20,
+      "daily_sync_selection_mode": "all_unseen_or_metadata_changed_since_baseline",
+      "daily_sync_detail_batch_size": 100,
+      "daily_sync_total_cap_per_run": null,
+      "requests_per_second": 1,
+      "concurrency": 1,
+      "human_checkbox_decision_required": true,
+      "unreviewed_auto_promotion": false,
+      "canonical_auto_promotion_after_explicit_human_commit": true,
+      "public_release_auto_promotion": false,
+      "source_image_download": true,
+      "source_image_download_target": "global_local_private_remote_cache_only"
+    }
+  },
+  "deployment": {
+    "status": "public_mvp_deployed",
+    "provider_target": "cloudflare",
+    "publish_authorized": true,
+    "authorization_scope": "public-awesome-gpt-image-2-mvp-529-only",
+    "staging_canary": {
+      "status": "deployed_access_protected_admin_shell_canary",
+      "url": "https://image-prompt-archive-staging.andrew4may.workers.dev",
+      "worker_name": "image-prompt-archive-staging",
+      "worker_version_id": "dbd0856f-78c7-4bce-a9dd-f6846467d7f0",
+      "r2_bucket": "image-prompt-archive-private-staging",
+      "r2_object_count": 0,
+      "public_record_count": 0,
+      "private_data_included": false,
+      "admin_enabled": true,
+      "neon_or_hyperdrive_bound": false,
+      "cloudflare_access_status": "active_outer_302_and_worker_jwt_validation",
+      "deployed_at": "2026-09-02T15:11:42Z"
+    },
+    "public_mvp": {
+      "status": "deployed",
+      "url": "https://image-prompt-archive-public-staging.andrew4may.workers.dev/",
+      "worker_name": "image-prompt-archive-public-staging",
+      "worker_version_id": "b426a4d9-3bde-4dc6-a47b-c58da630e883",
+      "deployment_lane": "public-awesome-gpt-image-2-mvp",
+      "public_record_count": 529,
+      "preview_image_count": 532,
+      "source_signal_count": 1,
+      "private_data_included": false,
+      "admin_data_included": false,
+      "rights_boundary": "source_attributed_learning_research_reference_only",
+      "release_record_path": "deploy/cloudflare-public/release-record.json",
+      "deployment_manifest_path": "deploy/cloudflare-public/deployment-manifest.json"
+    },
+    "full_archive_status": "blocked",
+    "remaining_blockers_for_full_archive": [
+      "featured candidates are review-only generated staging assets",
+      "third-party source and prompt rights require per-record review",
+      "public export is metadata-only until item-level prompt and media rights are cleared",
+      "legacy dashboard has not yet cut over to canonical public shards"
+    ]
+  },
+  "duplicate_analysis": {
+    "status": "internal_canary",
+    "exact_prompt_scope": "all_canonical_records",
+    "exact_media_scope": "all_local_canonical_assets",
+    "perceptual_sample_limit": 128,
+    "automatic_merge_or_delete": false,
+    "remote_media_fetch": true,
+    "remote_media_fetch_scope": "all_eligible_unique_direct_public_https_urls",
+    "thumbnail_format": "webp",
+    "thumbnail_max_dimension": 640,
+    "private_index_excluded_from_dist": true
+  },
+  "analysis_routing": {
+    "status": "active_policy",
+    "goal": "deterministic_first_minimum_model_cost",
+    "tiers": [
+      {
+        "tier": 0,
+        "name": "deterministic_pre_filter",
+        "uses_model": false,
+        "responsibilities": [
+          "prompt_sha256",
+          "image_sha256",
+          "url_normalization",
+          "content_type_validation",
+          "width_height_probe",
+          "phash_dhash",
+          "exact_duplicate_collapse"
+        ]
+      },
+      {
+        "tier": 1,
+        "name": "heuristic_family_grouping",
+        "uses_model": false,
+        "responsibilities": [
+          "token_normalization",
+          "alias_detection",
+          "same_prompt_different_subject_candidate",
+          "same_image_different_prompt_candidate",
+          "host_and_source_signals"
+        ]
+      },
+      {
+        "tier": 2,
+        "name": "lightweight_semantic_judgement",
+        "preferred_model": "gpt-5.6-luna",
+        "use_only_for": [
+          "ambiguous taxonomy tagging",
+          "ordinary people and brand presence tagging",
+          "family label suggestion",
+          "search synonym expansion",
+          "human readable duplicate notes"
+        ]
+      },
+      {
+        "tier": 3,
+        "name": "high_confidence_review_assist",
+        "preferred_model": "gpt-5.6-terra",
+        "use_only_for": [
+          "hard semantic conflicts",
+          "merge recommendation drafts",
+          "cross source canonical ranking with explanation",
+          "people brand and rights risk triage before a release decision"
+        ]
+      },
+      {
+        "tier": 4,
+        "name": "rare_escalation_only",
+        "preferred_model": "gpt-5.6-sol",
+        "use_only_for": [
+          "final risk sensitive release adjudication after lower cost lanes",
+          "exception policy edge cases explicitly escalated by a human"
+        ],
+        "batch_default": false
+      }
+    ],
+    "cache_key": "content_sha256+analysis_schema_version+model_id+model_revision",
+    "analyze_unique_hashes_only": true,
+    "sol_batch_allowed": false
+  },
+  "media_delivery": {
+    "status": "compressed_dist_webp_v1",
+    "preferred_format": "webp",
+    "preferred_format_for_future_public_bundle": "webp",
+    "fallback_for_opaque": "jpeg",
+    "fallback_for_alpha": "png",
+    "dist_includes_original_source_media": false,
+    "private_originals_retained": true,
+    "current_python_builder_emits_avif": false,
+    "avif_policy": "private_benchmark_only_not_emitted_to_public_bundle_v1",
+    "modern_format_benchmark": "data/private-research/media-benchmarks/modern-current/modern_format_benchmark.json",
+    "quality_equivalence_human_review_required": true
+  },
+  "remote_media_canary": {
+    "status": "user_authorized_local_full_cache",
+    "inventory_path": "data/private-research/remote-media-canary/current/inventory.json",
+    "latest_run_path": "data/private-research/remote-media-canary/current/latest_run.json",
+    "cache_index_path": "data/private-research/remote-media-canary/current/cache_index.json",
+    "blob_root": "data/private-research/remote-media-canary/blobs",
+    "eligible_url_scope": "all_unique_direct_public_https_urls_on_exact_allowlisted_hosts",
+    "full_cache_command": "python src/remote_media_canary.py --all --fetch --apply --concurrency 4",
+    "full_cache_limit": null,
+    "fetch_limit_per_run": 10,
+    "fetch_limit_per_run_applies_to": "bounded_canary_only",
+    "concurrency": 4,
+    "max_concurrency": 8,
+    "same_host_parallelism": 1,
+    "per_host_min_interval_seconds": 1.0,
+    "retryable_http_statuses": [
+      429,
+      500,
+      502,
+      503,
+      504
+    ],
+    "retry_max_attempts": 5,
+    "retry_backoff_cap_seconds": 60,
+    "resume_strategy": "url_hash_receipts_plus_cache_index_skip_completed",
+    "checkpoint_every_urls": 25,
+    "max_bytes_per_asset": 15728640,
+    "max_decoded_pixels_per_asset": 80000000,
+    "minimum_free_disk_gib": 5,
+    "disk_floor_behavior": "checkpoint_and_pause_then_resume_after_space_is_available",
+    "authentication_or_paywall_bypass": false,
+    "public_promotion": false,
+    "r2_promotion": false,
+    "item_rights_remain_separate": true
+  },
+  "legacy_tools": {
+    "mutating_collectors_enabled": false,
+    "path_resolution": "tools/archive_paths.py with MARKETER_WORKSPACE_ROOT and IMAGE_ARCHIVE_LEGACY_ROOT overrides",
+    "reason": "Path discovery is repaired, but mutating collectors remain disabled until each write-mode canary is reviewed."
+  }
+}

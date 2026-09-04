@@ -1,0 +1,21 @@
+{
+  "name": "image-archive-owner-api-v2",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-09-04",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "PRIVATE_API_ENABLED": "false",
+    "LIVE_QUERY_EMBEDDING_ENABLED": "false",
+    "DAILY_QUERY_CALL_LIMIT": "20",
+    "DAILY_QUERY_TOKEN_LIMIT": "40000",
+    "ACCESS_JWT_REQUIRED": "true"
+  },
+  "ratelimits": [{
+    "name": "OWNER_RATE_LIMITER",
+    "namespace_id": "26090402",
+    "simple": { "limit": 20, "period": 60 }
+  }],
+  "r2_buckets": [{ "binding": "PRIVATE_MEDIA", "bucket_name": "image-prompt-archive-private-staging" }],
+  "observability": { "enabled": false }
+}

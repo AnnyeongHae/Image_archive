@@ -1,0 +1,43 @@
+name: Image archive v2 offline contracts
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "platform/v2/**"
+      - "src/image_rag_eval/**"
+      - "src/serve_image_admin.py"
+      - "db/v2/**"
+      - "qa/test_v2_*.py"
+      - "qa/test_repository_boundary.py"
+      - "qa/validate_repository_boundary.py"
+      - "qa/test_intake_keys.mjs"
+      - ".github/workflows/image-archive-v2-offline.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-archive-v2-offline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - name: Verify public index and safe boundary fixtures
+        run: |
+          python -B qa/validate_repository_boundary.py
+          python -B -m unittest qa.test_repository_boundary -v
+      - name: Verify authentication, groups, budget and media with mocked providers
+        run: node --test platform/v2/tests/*.test.mjs
+      - name: Verify key contracts using temporary synthetic keys only
+        run: node --test qa/test_intake_keys.mjs
+      - name: Parse local coordinator code without importing private providers
+        run: python -B -c "import ast,pathlib; paths = [*pathlib.Path('platform/v2/local').glob('*.py'), *pathlib.Path('src/image_rag_eval').glob('*.py'), pathlib.Path('src/serve_image_admin.py')]; [ast.parse(p.read_text(encoding='utf-8')) for p in paths]"
+      # No cloud credentials, inference, deployment, private data or key artifact uploads.

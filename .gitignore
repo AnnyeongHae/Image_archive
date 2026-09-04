@@ -7,6 +7,8 @@ __pycache__/
 .tmp/
 dist/
 Reports/
+.wrangler/
+.wrangler-dry-run/
 
 # GitHub is the source/contract boundary, not the multi-GB data lake.
 data/private-research/*
@@ -34,3 +36,17 @@ qa/*.png
 qa/*.log
 qa/*.stdout.log
 qa/*.stderr.log
+
+# v2: code-only repository; runtime secrets, cloud bundles and media stay private.
+.dev.vars
+.dev.vars.*
+*.private.jwk.json
+*.pem
+*.key
+node_modules/
+platform/v2/.wrangler/
+platform/v2/runtime/
+deploy/cloudflare-public/public/
+deploy/cloudflare-public/public-backup*/
+*.bundle
+*.zip

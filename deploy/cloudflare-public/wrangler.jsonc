@@ -1,0 +1,32 @@
+{
+  "name": "image-prompt-archive-public-staging",
+  "main": "./worker/index.js",
+  "compatibility_date": "2026-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "DEPLOYMENT_LANE": "public-awesome-gpt-image-2-mvp",
+    "PUBLIC_RECORD_COUNT": "529"
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": [
+      "/healthz",
+      "/api/*",
+      "/admin",
+      "/admin/*",
+      "/approval-requests*",
+      "/source-admin*",
+      "/duplicate-review*"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    }
+  }
+}

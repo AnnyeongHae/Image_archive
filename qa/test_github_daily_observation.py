@@ -33,7 +33,7 @@ class GitHubDailyObservationTests(unittest.TestCase):
             ],
         }
 
-        def fake_live(repository: str):
+        def fake_live(repository: str, *, get=None):
             payload = copy.deepcopy(fixture)
             payload["repository"]["full_name"] = repository
             payload["repository"]["html_url"] = f"https://github.com/{repository}"

@@ -1,0 +1,35 @@
+name: Image administrator offline boundary checks
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "app/image-admin/**"
+      - "src/image_rag_eval/approved_library.py"
+      - "src/image_rag_eval/private_library_bundle.py"
+      - "deploy/cloudflare-staging/worker/**"
+      - "qa/test_private_library_worker.mjs"
+      - "qa/test_cloudflare_staging_worker.mjs"
+      - ".github/workflows/image-admin-offline.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: image-admin-offline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout reviewed source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Parse browser script
+        run: node --check app/image-admin/admin.js
+      - name: Test Access and disabled private R2 adapter using in-memory fixtures
+        run: node --experimental-default-type=module --test qa/test_cloudflare_staging_worker.mjs qa/test_private_library_worker.mjs
+      - name: Parse Python boundary without importing providers or installing packages
+        run: python -c "import ast,pathlib; [ast.parse(p.read_text(encoding='utf-8')) for p in [pathlib.Path('src/serve_image_admin.py'),pathlib.Path('src/prepare_image_private_bundle.py'),pathlib.Path('src/image_rag_eval/approved_library.py'),pathlib.Path('src/image_rag_eval/private_library_bundle.py')]]"
+      # No secret contexts, private artifacts, cloud commands or remote deployment.

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Image Archive Featured Five</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles/app.css">
+  </head>
+  <body data-platform-root="..">
+    <div class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Image Archive Platform</p>
+        <h1>Reference first. 고르고, 그 다음에 만든다.</h1>
+        <p class="hero-copy">
+          지금은 생성이 아니라 선택 단계다. 대표 5개 예시를 먼저 보고, 가장 마음에 드는
+          <strong>Reference Style ID</strong>를 고른 뒤 전체 아카이브로 확장한다.
+        </p>
+        <div class="hero-actions">
+          <a class="primary-link" href="../legacy/current_archive/index.html">기존 전체 아카이브 열기</a>
+          <p class="hero-note">이 화면은 포트폴리오용 canary이며, 직접 생성 기능은 포함하지 않는다.</p>
+        </div>
+      </header>
+
+      <main>
+        <section class="selection-panel" aria-labelledby="selection-title">
+          <div>
+            <p class="panel-label">Selection Flow</p>
+            <h2 id="selection-title">가장 강한 5개만 먼저 본다</h2>
+          </div>
+          <div class="selection-status" id="selectionStatus" aria-live="polite"></div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <p class="panel-label">Featured Five</p>
+            <p class="section-copy">스토리보드, 패션 히어로, 편집 레이아웃, 스티커 변환, 회화 변환을 한 화면에 묶었다.</p>
+          </div>
+          <div class="card-grid" id="cardGrid"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./data/featured-five.js"></script>
+    <script src="./scripts/app.js"></script>
+  </body>
+  </html>

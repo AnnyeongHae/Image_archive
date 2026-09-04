@@ -1,0 +1,34 @@
+{
+  "name": "image-prompt-archive-staging",
+  "main": "./worker/index.js",
+  "compatibility_date": "2026-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "DEPLOYMENT_LANE": "access-admin-shell-canary",
+    "PUBLIC_RECORD_COUNT": "0",
+    "ADMIN_ENABLED": "true",
+    "ACCESS_JWT_REQUIRED": "true",
+    "TEAM_DOMAIN": "https://travel-agency.cloudflareaccess.com",
+    "POLICY_AUD": "ce2ce161bc489c0c16f510706bf62ac48bb042a032752f1059ad06d2a0349ee8"
+  },
+  "r2_buckets": [
+    {
+      "binding": "ARCHIVE_MEDIA",
+      "bucket_name": "image-prompt-archive-private-staging"
+    }
+  ],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": true
+  },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    }
+  }
+}

@@ -1,4 +1,25 @@
-# Image Archive Platform
+# Image Archive Platform · v2
+
+이미지와 정확한 원문 프롬프트를 찾아 재활용하는 아카이브다.
+
+- 일반 방문자: 공개 승인된 이미지·프롬프트 열람/복사. [기존 공개 MVP](https://image-prompt-archive-public-staging.andrew4may.workers.dev/).
+- 소유자: Cloudflare 인증 API로 활용 중심 RAG 검색, 그룹 대표 한 장과 멤버 펼쳐보기.
+- 수집: 허용된 공개 소스만 GitHub Actions에서 증분 관찰/암호화 인계. 로컬에서 중복·사람 승인·Luna·임베딩 후 비공개 Neon/Qdrant snapshot.
+
+**v2 구현·검증 진행 중이며, 새 API가 배포 완료되었다는 의미는 아니다.** 현재 확인된 전체 canonical은 19,005개 레코드(이미지 파일 수가 아님)다. 기존 별도 공개 529 CASE와 private 19,005를 합쳐 공개하지 않는다. 기존 데이터는 제자리 보존하며 코드 저장소에는 DB·캐시·원본 이미지·secret을 넣지 않는다.
+
+시작점: [v2 운영 문서](platform/v2/README.md), [승인된 RAG 순서](docs/IMAGE_RAG_PIPELINE_DECISION.md), [v2 배포 전략](docs/IMAGE_ARCHIVE_V2_DEPLOYMENT.md).
+
+```powershell
+node --test platform/v2/tests/*.test.mjs
+python -B -m unittest qa.test_v2_intake -v
+# 기존 로컬 증거가 있는 운영 PC에서만: dry-run / 새 모델 호출 없음
+python -B platform/v2/local/cloud_snapshot.py
+```
+
+새 git clone에는 private 데이터와 parent workspace 계약이 없다. 운영 PC의 검증된 백업/별도 데이터 인계가 필요하다. 아래 v1 설명의 과거 건수·배포 예정 표기는 역사적 맥락이다.
+
+## v1 기록 — 아래 수량·상태는 당시 스냅샷
 
 이 디렉토리는 이미지 프롬프트 아카이브 플랫폼의 새 루트다. 기존 대시보드와 수집 산출물은 `legacy/current_archive/`에 그대로 보존하고, 그 위에 포트폴리오용 정적 플랫폼 레이어를 얹는다.
 
@@ -11,7 +32,13 @@
 - 승인 초안의 durable 사본은 `data/private-research/opennana/decisions/decision-draft.json`에 유지된다.
 - `legacy/current_archive/duplicate-review.html`: 완전중복과 이미지 유사 후보를 원본 변경 없이 비교하는 읽기 전용 화면이다.
 
+최신 소스 확장 조사와 다음 작업 handoff:
+
+- `../Reports/2026-09-03-01_이미지프롬프트_소스확장_조사와_운영인계.md`: 현재 공개 MVP, 권리·자동화 경계, 신규 GitHub/API source 조사, 중복 계보, 다음 개발 질문과 새 작업 시작 프롬프트를 한 문서로 정리한 정본 보고서다.
+
 ## 현재 상태 한줄 요약
+
+- 이미지 RAG의 승인된 운영 순서·선택 이유·임베딩 역할은 [ADR-IMAGE-RAG-001](docs/IMAGE_RAG_PIPELINE_DECISION.md)을 따른다. 중복/사람 검토 이후 Luna 분석, 이후 활용 텍스트 임베딩이며 원문 전체 보존과 검색 요약 입력을 구분한다.
 
 - 플랫폼 루트 안의 물리 파일 수와 브라우저가 보여 주는 레코드 수는 다르다.
 - `legacy/current_archive/`의 안전 이전과 현재 18,815개 전체 canonical JSONL 투영은 완료됐다.
