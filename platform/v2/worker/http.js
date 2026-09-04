@@ -41,7 +41,9 @@ export async function fetchJson(url, init = {}, { timeout = 8000, maxBytes = 104
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
-    const response = await fetch(url, { ...init, signal: controller.signal, redirect: "error" });
+    // workerd supports follow/manual, not error. Never follow a redirect with
+    // provider credentials: manual returns 3xx, rejected by the !ok gate below.
+    const response = await fetch(url, { ...init, signal: controller.signal, redirect: "manual" });
     if (!response.ok) { await response.body?.cancel(); throw new ApiError("upstream_unavailable", 503); }
     return await readJsonBounded(response, maxBytes);
   } catch (error) {

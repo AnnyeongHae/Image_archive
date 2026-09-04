@@ -43,7 +43,7 @@ function mockJwks(keys = [jwk]) {
   globalThis.fetch = async (url, options) => {
     calls.push({ url: String(url), options });
     assert.equal(String(url), `${issuer}/cdn-cgi/access/certs`);
-    assert.equal(options.redirect, "error");
+    assert.equal(options.redirect, "manual");
     assert.equal(options.credentials, "omit");
     assert.ok(options.signal);
     return Response.json({ keys });
@@ -68,6 +68,21 @@ test("owner signature and exact configured email return only principal fields", 
   assert.deepEqual(principal.scopes, ["rag:search", "archive:read", "admin:read"]);
   assert.equal(calls.length, 1);
   assert.ok(Object.isFrozen(principal));
+});
+
+test("JWKS redirects are refused without following a new issuer", async () => {
+  for (const status of [301, 302, 303, 307, 308]) {
+    const auth = await fresh(); let calls = 0;
+    globalThis.fetch = async (url, options) => {
+      calls++;
+      assert.equal(String(url), `${issuer}/cdn-cgi/access/certs`);
+      assert.equal(options.redirect, "manual");
+      return new Response(null, { status, headers: { Location: "https://untrusted.example.test/keys" } });
+    };
+    await assert.rejects(auth.verifyAccessOwner(accessRequest(await jwt()), env()),
+      error(503, "access_keys_unavailable"));
+    assert.equal(calls, 1);
+  }
 });
 
 test("all owner configuration is explicit and missing or wildcard owner config fails before fetch", async () => {

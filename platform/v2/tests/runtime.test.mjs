@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import worker, { searchInput } from '../worker/index.js';
 import { neonEndpoint, sql } from '../worker/neon.js';
-import { finiteVector, readJsonBounded, sha256 } from '../worker/http.js';
+import { fetchJson, finiteVector, readJsonBounded, sha256 } from '../worker/http.js';
 import { queryVector, searchGroups, qdrantBase, resetQueryCacheForTests } from '../worker/retrieval.js';
 
 const snapshot='a'.repeat(64), manifest='b'.repeat(64);
@@ -37,6 +37,23 @@ test('input accepts only top1/3/5 and exactly one query source',()=>{
 test('Neon endpoint allowlist and API regional hostname',()=>{
   assert.equal(neonEndpoint('postgres://u:p@ep-test.us-east-2.aws.neon.tech/db'),'https://api.us-east-2.aws.neon.tech/sql');
   for(const dsn of ['postgres://u:p@evil.test/db','postgres://u:p@neon.tech.evil.test/db','https://ep-test.aws.neon.tech/db'])assert.throws(()=>neonEndpoint(dsn));
+});
+
+test('provider fetch refuses redirects and never forwards credentials to Location',async()=>{
+  for(const status of [301,302,303,307,308]) {
+    let calls=0;
+    await withFetch(async(url,init)=>{
+      calls++;
+      assert.equal(url,'https://api.us-east-2.aws.neon.tech/sql');
+      assert.equal(init.redirect,'manual');
+      return new Response(null,{status,headers:{Location:'https://untrusted.example.test/steal'}});
+    },async()=>{
+      await assert.rejects(fetchJson('https://api.us-east-2.aws.neon.tech/sql',{
+        method:'POST',headers:{'Neon-Connection-String':'synthetic-only'},body:'{}',redirect:'follow',
+      }),{code:'upstream_unavailable',status:503});
+      assert.equal(calls,1);
+    });
+  }
 });
 test('Qdrant endpoint/config rejects unsafe sources',async()=>{
   const e=await env();assert.match(qdrantBase(e),/^https:/);

@@ -98,7 +98,9 @@ async function boundedJwks(issuer) {
   });
   const download = async () => {
     const response = await fetch(`${issuer}/cdn-cgi/access/certs`, {
-      headers: { Accept: "application/json" }, redirect: "error", credentials: "omit", signal: controller.signal,
+      // workerd rejects redirect:"error". Manual + the !ok gate rejects 3xx
+      // without following a Location or changing the trusted issuer.
+      headers: { Accept: "application/json" }, redirect: "manual", credentials: "omit", signal: controller.signal,
     });
     if (!response.ok || !response.body) denied("access_keys_unavailable", 503);
     const declared = response.headers.get("content-length");
