@@ -4,6 +4,10 @@
 - 이미지 프롬프트 아카이브, 대표 예시 큐레이션, 포트폴리오용 정적 UI, 배포 준비 구조는 이 디렉토리를 우선 참조한다.
 
 ## Routing
+- 공개 v2의 별도 reference-display adapter: `platform/v2/local/public_frontend_release.py`. 항목·그룹·원문·미디어 SHA를 묶은 별도 grant로 새 파일을 구성한다. 후보는 `data/private-research/v2/p/`에만 준비하고, `public_deployment.py`로 정확한 Worker/도메인/파일을 고정한다. pending 후보는 공개 승인이 아니며 기존 `private_local_preview`의 mode를 바꿔 배포하지 않는다. 실서비스 완료 기준/증거는 `docs/IMAGE_ARCHIVE_V2_SERVICE_COMPLETION.md`.
+- 개인 API 신규 질의 활성화의 별도 준비 경로: `platform/v2/local/query_activation.py --prepare`. 기존 기본-disabled 빌더와 승인 이력은 수정하지 않는다. 실제 활성화는 후보 SHA·일별 예산·검증 질의 수의 사람 승인 후에만 한다. 원래 runtime secret 묶음을 재업로드하지 말고 현재 Qdrant 읽기 전용 키를 보존한다.
+- 일반 사용자용 프론트 v2 소스: `platform/v2/frontend/`. 계약 `platform/v2/frontend/CONTRACT.md`, 오프라인 빌더 `platform/v2/local/frontend_projection.py`, 로컬 미리보기 `platform/v2/local/frontend_preview.py`. 이 경로는 관리자 UI·레거시 공개 529건·Featured Five와 구분한다. 실제 신규 공개는 별도 권리/릴리스 게이트가 필요하다.
+- 프론트 목적 카테고리: `platform/v2/contracts/browse-categories.v1.json`의 8개 ID + 미분류. 매핑·미래 Luna 선택 규칙은 `docs/IMAGE_ARCHIVE_BROWSE_CATEGORIES.md`를 따른다. 자유 텍스트로 임의 카테고리를 만들거나 사람 확정 시각 그룹·대표를 바꾸지 않는다.
 - v2 운영 API/클라우드 snapshot/소스 중립 입고 시작점: `platform/v2/README.md`. 기존 데이터/레거시 위치를 이동하지 않는 additive v2다.
 - v2 입고→4단계 관리자 연결: `platform/v2/local/review_bridge.py`, 계약 `docs/IMAGE_ARCHIVE_V2_INTAKE_REVIEW.md`. 인증된 import receipt SHA와 전체 선택 미디어 hash를 고정하고, 이미지 캐시 누락을 빈 유사 후보/승인 완료로 해석하지 않는다. 새 run에 자동 승인 seed를 넣지 않는다.
 - 대표 예시 검토 시작점: `app/index.html`
@@ -49,6 +53,7 @@
 - 이 설계 승인은 새 API 호출·전량 재임베딩·권리 승격·배포 승인이 아니다. 원문 전체 포함, 통합 임베딩 전환, 후보/그룹 정책 변경은 영향·예산과 사람 평가를 제시하고 별도 결정한다.
 
 ## Safety
+- 프론트 v2의 `private_local_preview`는 공개 승인이 아닌 loopback 전용 확인본이다. 생성물은 ignored private 경로에 보존하고 공개 Worker에 배포하지 않는다. 공개 모드에 이미지 승인·MIT 관측·Luna 결과만으로 원문/이미지를 내보내지 않는다. 공개 카드와 상세에는 개인 메모·raw provenance·로컬 경로·벡터·소유자 API 토큰을 넣지 않는다.
 - v2 운영 코드는 `platform/v2/`, 신규 비공개 DB 계약은 `db/v2/`를 사용한다. `platform/__init__.py`를 만들지 않는다(Python 표준 모듈명 충돌).
 - 2026-09-04 사용자는 백업 후 기존 `AnnyeongHae/Image_archive` 저장소 갱신·배포 구현을 요청했다. 이는 private 원문/이미지/DB를 공개 Git에 올리거나 새로운 항목 권리를 승인한 것이 아니다. `.gitignore`와 staged 파일 허용/secret 검사를 모두 통과해야 한다.
 - 새 snapshot은 기존 379 이미지/377 텍스트 캐시를 검증해 재사용한다. Qdrant는 임베딩 API가 아니다. 컬렉션 업로드를 새 모델 호출로 보고하지 않는다.

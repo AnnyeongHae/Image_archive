@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="이미지의 형식과 활용 아이디어를 살펴보고, 정확한 원문 프롬프트를 복사하는 이미지 라이브러리.">
+  <title>Photoposting — 이미지 & 프롬프트 라이브러리</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%23176553'/%3E%3Cpath d='M16 35V13h10a8 8 0 010 16h-5v6zm5-11h5a3 3 0 000-6h-5z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./gallery.css">
+  <script type="module" src="./gallery.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#gallery-heading">이미지 목록으로 건너뛰기</a>
+  <div id="preview-notice" class="preview-notice" hidden><span class="preview-dot" aria-hidden="true"></span><strong>비공개 로컬 미리보기</strong><span>이미지 검토 완료와 공개·상업 이용 허가는 별개입니다. 외부 배포용 목록이 아닙니다.</span></div>
+  <header class="masthead">
+    <a class="wordmark" href="./" aria-label="Photoposting 처음으로">photoposting<span aria-hidden="true">.</span></a>
+    <span class="masthead-label">IMAGE & PROMPT LIBRARY</span>
+    <a class="text-link" href="#about">라이브러리 안내 <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main">
+    <section class="intro" aria-labelledby="page-title">
+      <div><p class="eyebrow">A PLACE FOR YOUR NEXT IDEA</p><h1 id="page-title">이미지에서 발견하는 <span class="title-ending">다음 아이디어<span class="accent">.</span></span></h1><p class="intro-description">마음에 드는 형식을 찾고, 프롬프트로 이어가세요. 닮은 이미지는 한데 모았습니다.</p></div>
+      <div class="library-numbers" aria-label="라이브러리 통계"><div><strong id="group-count">—</strong><span>개의 대표 아이디어</span></div><div><strong id="image-count">—</strong><span>개의 이미지와 프롬프트</span></div></div>
+    </section>
+    <section class="discovery" aria-label="이미지 찾기">
+      <form id="search-form" class="search-form" role="search">
+        <label class="sr-only" for="search">이미지 검색</label><span class="search-symbol" aria-hidden="true">⌕</span><input id="search" name="q" type="search" autocomplete="off" placeholder="어떤 아이디어가 필요한가요?  예: 잡지 표지, 제품, 풍경"><button type="submit">찾기 <span aria-hidden="true">↗</span></button>
+      </form>
+      <p class="search-help">분야·활용·스타일·배경·Style ID로 검색합니다. 유사 그룹 안의 이미지도 함께 찾아요.</p>
+      <nav id="category-filters" class="quick-filters category-filters" aria-label="이미지 분야"></nav>
+      <div class="filter-bar">
+        <div class="facet"><label for="usage-filter">활용</label><select id="usage-filter" aria-describedby="facet-note"><option value="">모든 활용</option></select></div>
+        <div class="facet"><label for="style-filter">스타일</label><select id="style-filter" aria-describedby="facet-note"><option value="">모든 스타일</option></select></div>
+        <div class="facet"><label for="background-filter">배경</label><select id="background-filter" aria-describedby="facet-note"><option value="">모든 배경</option></select></div>
+        <button id="reset-filters" type="button" class="reset-button">선택 초기화</button>
+      </div>
+      <p id="facet-note" class="facet-note">세부 필터는 전체 목록의 서로 다른 확정 그룹 2개 이상에서 쓰인 항목만 표시합니다. 숫자는 그룹 수이며, 나머지 항목도 검색·상세에서 확인할 수 있습니다.</p>
+    </section>
+    <section class="gallery-section" aria-labelledby="gallery-heading">
+      <div class="section-heading"><div><p class="eyebrow">EXPLORE THE COLLECTION</p><h2 id="gallery-heading" tabindex="-1">이미지 둘러보기 <span id="result-count"></span></h2></div><div class="sort-control"><label for="sort">정렬</label><select id="sort"><option value="datetime">최신순</option><option value="title">제목 순</option><option value="variants">변형 많은 순</option><option value="id">Style ID 순</option></select></div></div>
+      <p id="results-description" class="results-description" role="status" aria-live="polite">목록을 준비하고 있습니다.</p>
+      <div id="gallery-status" class="gallery-status"></div>
+      <div id="gallery" class="gallery-grid" aria-busy="true"></div>
+      <div class="load-more-wrap"><button id="load-more" class="secondary-button" type="button" hidden>이미지 더 보기 <span aria-hidden="true">↓</span></button><p id="page-progress"></p></div>
+    </section>
+  </main>
+  <footer id="about"><div><a class="wordmark" href="./">photoposting<span aria-hidden="true">.</span></a><p>이미지는 영감으로, 프롬프트는 다음 작업으로.</p></div><div class="footer-note"><strong>참고하기 전에, 출처와 권리를 확인해 주세요.</strong><p>이미지·프롬프트의 출처와 이용 조건은 항목별로 다릅니다. 표시된 라이선스와 출처를 확인하고, 상업 이용 가능 여부는 별도로 판단해 주세요. 활용 태그는 분석 제안일 수 있습니다.</p><p>공개 갤러리는 키워드 탐색용입니다. 개인용 RAG API와 관리자 기능은 연결하지 않습니다.</p></div></footer>
+  <dialog id="detail-dialog" aria-labelledby="detail-title" class="detail-dialog"><div class="dialog-toolbar"><span class="eyebrow">IMAGE & ORIGINAL PROMPT</span><button id="close-dialog" type="button" class="close-button" aria-label="이미지 상세 닫기">닫기 <span aria-hidden="true">×</span></button></div><div id="detail-content" class="detail-content"></div></dialog>
+  <dialog id="copy-dialog" aria-labelledby="copy-title" class="copy-dialog"><h2 id="copy-title">원문을 직접 복사해 주세요</h2><p>브라우저에서 자동 복사를 허용하지 않았습니다. 아래 원문을 선택한 뒤 복사할 수 있습니다.</p><label class="sr-only" for="manual-prompt">복사할 원문 프롬프트</label><textarea id="manual-prompt" readonly spellcheck="false"></textarea><div class="manual-actions"><button id="select-prompt" type="button" class="primary-button">원문 전체 선택</button><button id="close-copy" type="button" class="secondary-button">닫기</button></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="no-script">이미지 탐색과 프롬프트 복사는 JavaScript가 필요합니다. 브라우저에서 JavaScript를 허용한 뒤 다시 열어 주세요.</p></noscript>
+</body>
+</html>

@@ -1,0 +1,107 @@
+{
+  "schema_version": "image-browse-categories-2",
+  "version": 1,
+  "axis": "intended_reuse_purpose",
+  "status": "controlled_browse_projection_not_a_human_visual_group",
+  "categories": [
+    {
+      "id": "commerce_brand",
+      "label": "상품·브랜드",
+      "definition_ko": "상품의 특징·사용 맥락·선택을 설명하거나 브랜드·행사·프로모션의 메시지를 전달하는 작업.",
+      "exclusions_ko": ["상품·로고·인물이 보인다는 사실만으로 판매 목적을 단정하지 않는다.", "활용 제안은 상품 성능·효능이나 실제 광고 성과의 근거가 아니다."],
+      "legacy_use_case_families": ["commerce", "brand"]
+    },
+    {
+      "id": "content_editorial",
+      "label": "콘텐츠·출판",
+      "definition_ko": "게시물·시리즈·기사·책·잡지·보고서의 표지, 본문 도입, 요약 또는 독자 소통에 쓰는 작업.",
+      "exclusions_ko": ["예쁜 이미지라는 이유만으로 모든 이미지를 썸네일·표지에 배정하지 않는다.", "명시적인 상품 판매·브랜드 프로모션이 주목적이면 상품·브랜드와 역할을 구분한다."],
+      "legacy_use_case_families": ["content", "editorial"]
+    },
+    {
+      "id": "information_education",
+      "label": "정보·교육",
+      "definition_ko": "개념·절차·차이·학습 활동을 이해하도록 설명·비교·순서의 시각 구조를 제공하는 작업.",
+      "exclusions_ko": ["문자가 많거나 도표처럼 생겼다는 이유만으로 정보의 정확성·교육 적합성을 확정하지 않는다.", "임의 수치·역사·의학·제품 정보를 이미지에서 검증된 사실로 추출하지 않는다."],
+      "legacy_use_case_families": ["education"]
+    },
+    {
+      "id": "character",
+      "label": "캐릭터",
+      "definition_ko": "캐릭터·마스코트의 정체성, 여러 시점, 표정 또는 반응을 일관되게 설계·참조하는 작업.",
+      "exclusions_ko": ["인물이나 동물이 등장한다는 사실만으로 캐릭터 설계 자료로 분류하지 않는다.", "기존 작품의 캐릭터·실제 인물의 권리나 재사용 허가는 별도 확인한다."],
+      "legacy_use_case_families": ["character"]
+    },
+    {
+      "id": "story_scene",
+      "label": "영상·스토리",
+      "definition_ko": "이야기의 핵심 비주얼, 장면 콘셉트, 샷 순서·스토리보드 또는 동작의 주요 순간을 기획하는 작업.",
+      "exclusions_ko": ["단일 정지 이미지로 실제 영상·애니메이션의 움직임과 일관성이 검증됐다고 하지 않는다.", "서사·장면 연출 근거가 없는 일반 일러스트를 자동 배정하지 않는다."],
+      "legacy_use_case_families": ["narrative"]
+    },
+    {
+      "id": "space_place",
+      "label": "장소·공간",
+      "definition_ko": "장소의 방문 동선·길찾기·소개 또는 공간 분위기와 구성을 시각적으로 탐색하는 작업.",
+      "exclusions_ko": ["야외·실내 배경이 있다는 사실만으로 장소 안내나 공간 기획 목적을 추정하지 않는다.", "가상 지도·건축·풍경을 실제 위치·시설·안전 정보로 간주하지 않는다."],
+      "legacy_use_case_families": ["spatial"]
+    },
+    {
+      "id": "web_app",
+      "label": "웹·앱",
+      "definition_ko": "웹·앱·서비스의 진입 화면, 사용 안내, 상태 피드백 또는 기능 흐름을 표현하는 작업.",
+      "exclusions_ko": ["UI 모양의 이미지가 실제 동작하는 서비스·검증된 사용자 경험이라는 뜻은 아니다.", "상품 홍보용 비주얼과 기능·행동 안내용 비주얼의 역할을 구분한다."],
+      "legacy_use_case_families": ["service"]
+    },
+    {
+      "id": "graphic_goods",
+      "label": "그래픽·굿즈",
+      "definition_ko": "독립 오브젝트·스티커·아이콘, 반복 패턴, 인쇄 굿즈 또는 포장·라벨 표면의 그래픽을 디자인하는 작업.",
+      "exclusions_ko": ["흰 바탕을 투명 배경으로, 반복 무늬를 검증된 무봉제 패턴으로 단정하지 않는다.", "인쇄·재단·색상·해상도·권리 확인 없이 제작 준비가 끝났다고 하지 않는다."],
+      "legacy_use_case_families": ["decorative"]
+    },
+    {
+      "id": "people",
+      "label": "인물",
+      "definition_ko": "사람의 표정·동작·인물 중심 구도와 연출을 참고하는 작업.",
+      "exclusions_ko": ["사람이 배경에 작게 보이는 것만으로 인물 중심이라고 단정하지 않는다.", "실존 인물의 초상권·저작권·재사용 권리는 별도 확인한다."],
+      "legacy_use_case_families": ["people"]
+    }
+  ],
+  "unclassified": {
+    "id": "unclassified",
+    "label": "미분류",
+    "definition_ko": "허용된 작업 ID와 연결되지 않았거나, 활용 목적을 선택할 근거가 충분하지 않은 상태.",
+    "exclusions_ko": ["기타라는 새 활용 카테고리로 취급하지 않는다.", "자유 텍스트의 단어·제목·스타일·배경을 유사 매칭하여 임의 분류하지 않는다."]
+  },
+  "legacy_projection": {
+    "mapping_basis": "known_exact_use_case_id_then_explicit_family_mapping",
+    "unknown_or_free_text_policy": "unclassified_without_heuristic_remapping",
+    "unknown_id_in_strict_legacy_schema": "preserve_existing_input_validation_failure",
+    "max_categories": "preserve_all_distinct_known_mappings_without_retroactive_truncation",
+    "retain_original_prompts_and_legacy_metadata": true,
+    "changes_visual_group_ids_or_representatives": false,
+    "writes_database": false,
+    "model_calls": 0
+  },
+  "future_llm": {
+    "allowed_category_ids": ["commerce_brand", "content_editorial", "information_education", "character", "story_scene", "space_place", "web_app", "graphic_goods", "people"],
+    "primary": {"count": 1, "allow_null_on_abstention": true},
+    "secondary": {"max_count": 1, "distinct_from_primary": true, "requires_independent_reuse_reason": true},
+    "abstention": {"category_id": "unclassified", "reason_required": true, "secondary_must_be_empty": true},
+    "evidence": {
+      "required_per_selected_category": true,
+      "accepted_sources": ["image", "prompt", "image_and_prompt"],
+      "separate_visual_observation_from_prompt_intent": true,
+      "explain_why_usable_what_changes_and_constraints": true,
+      "prompt_only_selection_is_conditional": true,
+      "human_memos_require_separate_provenance": true
+    },
+    "no_new_category_ids_or_free_text_category_labels": true,
+    "style_background_and_subject_are_separate_facets": true,
+    "candidate_only_until_human_review": true,
+    "changes_visual_group_ids_or_representatives": false,
+    "grants_rights_or_public_release": false,
+    "execution_authorized_by_this_contract": false
+  }
+}
